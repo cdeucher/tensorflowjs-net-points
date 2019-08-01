@@ -2,18 +2,14 @@ let video;
 let poseNet;
 let poses = [];
 
+
 function setup() {
   const canvas = createCanvas(640, 480);
   canvas.parent('videoContainer');
 
-  // Video capture
   video = createCapture(VIDEO);
   video.size(width, height);
-
-  // Create a new poseNet method with a single detection
   poseNet = ml5.poseNet(video, modelReady);
-  // This sets up an event that fills the global variable "poses"
-  // with an array every time new poses are detected
   poseNet.on('pose', function(results) {
     poses = results;
   });
@@ -21,17 +17,30 @@ function setup() {
 function modelReady(){
   select('#status').html('model Loaded')
 } 
-
 function drawKeypoints()  {
-  // Loop through all the poses detected
+  side = 0; 
+  jump = 0;
   for (let i = 0; i < poses.length; i++) {
-    // For each pose detected, loop through all the keypoints
     let pose = poses[i].pose;
     for (let j = 0; j < pose.keypoints.length; j++) {
-      // A keypoint is an object describing a body part (like rightArm or leftShoulder)
       let keypoint = pose.keypoints[j];
-      // Only draw an ellipse is the pose probability is bigger than 0.2
       if (keypoint.score > 0.2) {
+        //command
+        if(keypoint.part == "rightWrist")  {
+          console.log('poses',keypoint)
+            console.log(keypoint.position)
+            if(keypoint.position.x > 350){
+              side = 2
+            } 
+            if(keypoint.position.x < 350){
+              side = 1
+            }     
+            if(keypoint.position.y < 100){
+              jump = 1
+            }                               
+        }
+           
+
         fill(255, 0, 0);
         noStroke();
         ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
@@ -39,13 +48,9 @@ function drawKeypoints()  {
     }
   }
 }
-
-// A function to draw the skeletons
 function drawSkeleton() {
-  // Loop through all the skeletons detected
   for (let i = 0; i < poses.length; i++) {
     let skeleton = poses[i].skeleton;
-    // For every skeleton, loop through all body connections
     for (let j = 0; j < skeleton.length; j++) {
       let partA = skeleton[j][0];
       let partB = skeleton[j][1];
@@ -57,8 +62,6 @@ function drawSkeleton() {
 
 function draw() {
   image(video, 0, 0, width, height);
-
-  // We can call both functions to draw all keypoints and the skeletons
   drawKeypoints();
-  drawSkeleton();
+  //drawSkeleton();
 }
