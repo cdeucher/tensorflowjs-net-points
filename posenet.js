@@ -26,14 +26,14 @@ function drawKeypoints()  {
       let keypoint = pose.keypoints[j];
       if (keypoint.score > 0.2) {
         //command
-        if(keypoint.part == "rightWrist")  {
+        if(keypoint.part == "rightWrist" || keypoint.part == "leftWrist")  {
           console.log('poses',keypoint)
             console.log(keypoint.position)
             if(keypoint.position.x > 350){
-              side = 2
+              side = 1
             } 
             if(keypoint.position.x < 350){
-              side = 1
+              side = 2
             }     
             if(keypoint.position.y < 100){
               jump = 1
